@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Crop Prediction and Price Estimation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700&display=swap');
+   body {
+    background: url(/templates/194671-farm-pixa.webp);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150vh;
+  background-color: #f2f2f2;
+  background-size: cover;
+  background-position: inherit;
+
+
+  font-family: 'Nunito', sans-serif;
+    margin:0; padding:0;
+    box-sizing: border-box;
+    outline: none; border:none;
+    text-decoration: none;
+    text-transform: capitalize;
+    transition:all .2s linear;
+}
+*::selection{
+    background:red;
+    color:#35f10f;
+  }
+.card {
+  width: 100%;
+  max-width: 800px;
+  background-color: #fff;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: auto;
+}
+.card-title{
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: black;
+  font-size: 20px;
+}
+.card .card-title {
+    font-size: 34px;
+    font-weight: bolder;
+}
+.card-header {
+  border-radius: 10px 10px 0 0;
+  justify-content: center;
+  align-items: center;
+}
+
+label{
+  font-size: 20px;
+  color: #f8f9fa;
+}
+.card-body {
+  padding: 30px;
+  background-color:#32CD32;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+}
+.form-control{
+  color: black;
+
+  height: 50px;
+  width: 50px;
+  size: 50;
+}
+   input::placeholder {
+    color: #ffffff;
+    font-weight: bold;
+}
+#result-container {
+  margin-top: 30px;
+}
+
+.table {
+  font-size: 14px;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  border-top: none;
+}
+
+.table td {
+  border-top: none;
+  font-size: larger;
+  font-weight: bolder;
+}
+.table .crop{
+font-size: large;
+
+}
+
+ 
+header{
+    position: fixed;
+    top:0; left: 0; right:0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background:#fff;
+    /* padding:2rem 9%; */
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+  }
+  
+  header .logo{
+    font-size: 1.8rem;
+    font-weight: bolder;
+    color:#666;
+  }
+  
+  header .logo i{
+    padding-right: .5rem;
+    color:var(--red);
+  }
+  
+  header .navbar a{
+    font-size: 1.6rem;
+    margin-left: 2rem;
+    color:#004023;
+  }
+  
+
+  
+  #menu-bar{
+    font-size: 3rem;
+    cursor: pointer;
+    color:rgb(62, 204, 7);
+    border:.1rem solid #666;
+    border-radius: .3rem;
+    padding:.5rem 1.5rem;
+    display: none;
+  }
+  .navbar{
+    background-color: #f9fffc;
+  }
+
+  
+@media(max-width:768px){
+
+    #menu-bar{
+      display: initial;
+    }
+  
+    header .navbar{
+      position: absolute;
+      top:100%; left:0; right:0;
+      background: rgb(225, 248, 227);
+      border-top: .1rem solid rgba(0,0,0,.1);
+      clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    }
+    header .navbar a:hover{
+        background-color: rgb(127, 224, 136);
+    }
+  
+    header .navbar.active{
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
+  
+    header .navbar a{
+      margin: 1.5rem;
+      padding:1.5rem 140px;
+      display: block;
+      border:.2rem solid rgba(0,0,0,.1);
+      border-left:.5rem solid var(--red);
+      /* background:#fff; */
+    }
+
+}
+
+
+    </style>
+</head>
+
+<body>
+  <header> 
+<!-- 
+    <a href="#" class="logo"><i class="fas fa-seedling"></i>Ferti</a> -->
+
+    <div id="menu-bar" class="fas fa-bars"></div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}">home</a>
+        <a href="{{ url_for('Detail') }}">Details</a>
+        <a href="{{ url_for('index11') }}">Model</a>
+    </nav>
+
+</header>
+    <div class="container">
+    
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title">{{x}}</h4>
+                    </div>
+                    <div class="card-body ">
+                        <form method="post" action="{{ url_for('predict')}}"  id="Home" class="needs-validation" novalidate>
+                            <div class="form-group">
+                              <label for="nitro">N value:</label>
+                              <input type="number" step="0.01" class="form-control" name="nitro" id="n-input" placeholder="Enter N value" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="pota">P value:</label>
+                              <input type="number" step="0.01" class="form-control" name="pota" id="p-input" placeholder="Enter P value" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="phos">K value:</label>
+                              <input type="number" step="0.01" class="form-control" name="phos" id="k-input" placeholder="Enter K value" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="soil">Soil Type:</label>
+                              <input type="text" class="form-control" name="district" id="district-input" placeholder="Enter Soil Type" required>
+                              <select id="district-input" name="soil" class="form-control" required>
+                                <!-- <option value="">Select a district</option> -->
+                                <option value=0>Black</option>
+            <option value="1">Clayey</option>
+            <option value="2">Loamy</option>
+            <option value="3">Red</option>
+            <option value="4">Sandy</option>
+                              </select>
+                            </div>
+
+
+                            
+                            <div class="form-group">
+                              <label for="crop">Crop Type:</label>
+                              <input type="text" class="form-control" name="district" id="district-input" placeholder="Enter Crop Type" required>
+                              <select id="district-input" name="crop" class="form-control" required>
+                                <option value=0>Barley</option>
+            <option value="1">Cotton</option>
+            <option value="2">Ground Nuts</option>
+            <option value="3">Maize</option>
+            <option value="4">Millets</option>
+            <option value="5">Oil Seeds</option>
+            <option value="6">Paddy</option>
+            <option value="7">Pulses</option>
+            <option value="8">Sugarcane</option>
+            <option value="9">Tobacco</option>
+            <option value="10">Wheat</option>
+                              </select>
+                            </div>
+                            <div class="form-group">
+                              <label for="temp">Temperature:</label>
+                              <input type="number" step="0.01" class="form-control" name="temp" id="k-input" placeholder="Enter Temperature value" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="humid">Humidity:</label>
+                              <input type="number" step="0.01" class="form-control" name="humid" id="k-input" placeholder="Enter Humidity value" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="mois">Moisture:</label>
+                              <input type="number" step="0.01" class="form-control" name="mois" id="k-input" placeholder="Enter Moisture value" required>
+                            </div>
+                            <button type="submit" name="submit"s class="btn btn-primary">Predict</button>
+                          </form>                          
+                    </div>
+                    <div id="result-container" class="container mt-5">
+                        <h5>Results:</h5>
+                        <table id="prediction-table" class="table table-striped mt-3">
+                          
+                          <tbody>
+                            <tr>
+                              <td>Crop</td>
+                              <td id="crop" class="crop">{{x}}</td>
+                            </tr>
+                            
+                          </tbody>
+                        </table>
+                        
+                      </div>
+                </div>
+            </div>
+        </div>
+   
+    </div>
+</body>
+
+<script>
+        
+  let menu = document.querySelector('#menu-bar');
+  let navbar = document.querySelector('.navbar');
+  
+  menu.onclick = () =>{
+  
+    menu.classList.toggle('fa-times');
+    navbar.classList.toggle('active');
+  
+  }
+  window.onscroll = () =>{
+  
+      menu.classList.remove('fa-times');
+      navbar.classList.remove('active');
+    
+      if(window.scrollY > 60){
+        document.querySelector('#scroll-top').classList.add('active');
+      }else{
+        document.querySelector('#scroll-top').classList.remove('active');
+      }
+    
+    }
+    
+      </script>
+</html>
